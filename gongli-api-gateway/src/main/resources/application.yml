@@ -1,0 +1,60 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: api-gateway
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      enabled: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+zuul:
+  prefix: /api # 添加路由前缀
+  retryable: true
+  routes:
+    item-service: /item/**
+    search-service: /search/**
+    item-detail: /detail/**
+    user-service: /user/**
+    auth-service: /auth/**
+  ignored-services: upload
+  host:
+    connect-timeout-millis: 6000
+    connection-request-timeout-millis: 6000
+  add-host-header: true
+  sensitive-headers:
+ribbon:
+  ConnectTimeout: 6000 # 连接超时时间(ms)
+  ReadTimeout: 6000 # 通信超时时间(ms)
+  OkToRetryOnAllOperations: true # 是否对所有操作重试
+  MaxAutoRetriesNextServer: 1 # 同一服务不同实例的重试次数
+  MaxAutoRetries: 1 # 同一实例的重试次数
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMillisecond: 6000 # 熔断超时时长：3000ms
+gongli:
+  jwt:
+    pubKeyPath:  D:\\tmp\\rsa\\rsa.pub # 公钥地址
+    cookieName: GL_TOKEN # cookie的名称
+gongli:
+  filter:
+    allowPaths:
+      - /api/auth
+      - /api/search
+      - /api/user/register
+      - /api/user/check
+      - /api/user/code
+      - /api/item
